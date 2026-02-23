@@ -1,6 +1,8 @@
+// --- APP STATE ---
 let logs = JSON.parse(localStorage.getItem('ojt_logs')) || [];
-let goalHours = localStorage.getItem('ojt_goal') || 400;
+let goalHours = localStorage.getItem('ojt_goal') || 486;
 
+// --- ELEMENTS ---
 const dtrBody = document.getElementById('dtrBody');
 const progressBar = document.getElementById('progressBar');
 const progressText = document.getElementById('progressText');
@@ -8,6 +10,7 @@ const btnIn = document.getElementById('btnIn');
 const btnOut = document.getElementById('btnOut');
 const btnLunch = document.getElementById('btnLunch');
 
+// --- INITIALIZE ---
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('requiredHoursInput').value = goalHours;
     startClock();
@@ -16,9 +19,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function startClock() {
     setInterval(() => {
-        // Force 24-hour format
-        document.getElementById('currentTime').innerText = new Date().toLocaleTimeString('en-GB', { 
-            hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false 
+        // 12-hour format for the live clock
+        document.getElementById('currentTime').innerText = new Date().toLocaleTimeString('en-US', { 
+            hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true 
         });
     }, 1000);
 }
@@ -30,6 +33,7 @@ function showAlert(message) {
     toast.show();
 }
 
+// --- CORE UI RENDER ---
 function renderUI() {
     let totalWorked = 0;
     logs.sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -54,18 +58,20 @@ function renderUI() {
             </tr>`;
     }).join('');
 
-    const remaining = Math.max(0, goalHours - totalWorked).toFixed(2);
+    const remaining = Math.max(0, goalHours - totalWorked);
     const percent = Math.min((totalWorked / goalHours) * 100, 100).toFixed(1);
 
+    // Main dashboard stays precise
     progressBar.style.width = percent + '%';
     progressBar.innerText = percent + '%';
     progressText.innerText = `${totalWorked.toFixed(2)} / ${goalHours} total hours`;
 
-    // Update Progress Modal
-    document.getElementById('modalCompleted').innerText = totalWorked.toFixed(2);
-    document.getElementById('modalRemaining').innerText = remaining;
-    document.getElementById('modalPercentage').innerText = percent + '%';
+    // UPDATE PROGRESS MODAL (WHOLE NUMBERS ONLY)
+    document.getElementById('modalCompleted').innerText = Math.round(totalWorked);
+    document.getElementById('modalRemaining').innerText = Math.round(remaining);
+    document.getElementById('modalPercentage').innerText = Math.round(percent) + '%';
 
+    // Button states
     const isClockedIn = logs.length > 0 && !logs[logs.length - 1].timeOut;
     btnIn.disabled = isClockedIn;
     btnOut.disabled = !isClockedIn;
@@ -75,11 +81,14 @@ function renderUI() {
     localStorage.setItem('ojt_logs', JSON.stringify(logs));
 }
 
+// --- EVENT HANDLERS ---
+
 btnIn.onclick = () => {
     const now = new Date();
     logs.push({
         date: now.toISOString().split('T')[0],
-        timeIn: now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false }),
+        // Save in 12-hour format
+        timeIn: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
         timeOut: null,
         rawIn: now.getTime(),
         duration: null,
@@ -100,7 +109,7 @@ btnOut.onclick = () => {
     const now = new Date();
     const lastLog = logs[logs.length - 1];
     if (lastLog && !lastLog.timeOut) {
-        lastLog.timeOut = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
+        lastLog.timeOut = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
         let diff = (now.getTime() - lastLog.rawIn) / 3600000;
         if (lastLog.lunchApplied) diff -= 1;
         lastLog.duration = Math.max(0, diff).toFixed(2);
@@ -110,14 +119,14 @@ btnOut.onclick = () => {
 
 function addManualEntry() {
     const dateVal = document.getElementById('manualDate').value;
-    const tIn = document.getElementById('manualIn').value;
-    const tOut = document.getElementById('manualOut').value;
+    const tInRaw = document.getElementById('manualIn').value;
+    const tOutRaw = document.getElementById('manualOut').value;
     const isLunch = document.getElementById('manualLunch').checked;
 
-    if (!dateVal || !tIn || !tOut) return showAlert("Please fill all fields");
+    if (!dateVal || !tInRaw || !tOutRaw) return showAlert("Please fill all fields");
 
-    const start = new Date(`${dateVal} ${tIn}`);
-    const end = new Date(`${dateVal} ${tOut}`);
+    const start = new Date(`${dateVal} ${tInRaw}`);
+    const end = new Date(`${dateVal} ${tOutRaw}`);
     
     if (end <= start) return showAlert("Time Out must be after Time In");
 
@@ -127,10 +136,14 @@ function addManualEntry() {
         diff -= 1;
     }
 
+    // Convert raw time inputs (24h) to 12h format for table display
+    const timeInFormatted = start.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+    const timeOutFormatted = end.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+
     logs.push({
         date: dateVal,
-        timeIn: tIn,
-        timeOut: tOut,
+        timeIn: timeInFormatted,
+        timeOut: timeOutFormatted,
         duration: diff.toFixed(2),
         rawIn: start.getTime(),
         lunchApplied: isLunch
@@ -139,12 +152,14 @@ function addManualEntry() {
     renderUI();
     bootstrap.Modal.getInstance(document.getElementById('manualEntryModal')).hide();
     
-    // Clear form
+    // Reset form
     document.getElementById('manualDate').value = "";
     document.getElementById('manualIn').value = "";
     document.getElementById('manualOut').value = "";
     document.getElementById('manualLunch').checked = false;
 }
+
+// --- SETTINGS ---
 
 function updateSettings() {
     goalHours = document.getElementById('requiredHoursInput').value;
@@ -161,16 +176,34 @@ function deleteLog(index) {
 }
 
 function clearAllData() {
-    if (confirm("Erase all logs?")) {
+    if (confirm("This will erase all logs permanently! Continue?")) {
         logs = [];
         renderUI();
     }
 }
 
+// --- PDF EXPORT ---
 document.getElementById('btnDownload').onclick = () => {
+    // Check if jsPDF library is loaded
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+        showAlert("PDF library is still loading. Please wait.");
+        return;
+    }
+
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    doc.text("OJT ATTENDANCE REPORT", 14, 15);
+    
+    // Header
+    doc.setFontSize(18);
+    doc.text("OJT ATTENDANCE REPORT", 14, 20);
+    doc.setFontSize(11);
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 28);
+    
+    // Summary info
+    const completed = document.getElementById('modalCompleted').innerText;
+    doc.text(`Total Completed Hours: ${completed} hrs`, 14, 35);
+
+    // Prepare Table Data
     const tableData = logs.map(l => [
         l.date, 
         new Date(l.date).toLocaleDateString('en-US', {weekday:'short'}), 
@@ -178,6 +211,18 @@ document.getElementById('btnDownload').onclick = () => {
         l.timeOut || '-', 
         l.duration || '0.00'
     ]);
-    doc.autoTable({ head: [['Date', 'Day', 'In', 'Out', 'Hours']], body: tableData, startY: 25 });
-    doc.save("OJT_DTR_Report.pdf");
+
+    // Generate Table
+    doc.autoTable({ 
+        head: [['Date', 'Day', 'In', 'Out', 'Hours']], 
+        body: tableData, 
+        startY: 40,
+        theme: 'grid',
+        headStyles: { fillColor: [33, 37, 41] },
+        styles: { halign: 'center' }
+    });
+
+    // Filename Fix: Using current date instead of the undefined 'dateVal'
+    const today = new Date().toISOString().split('T')[0];
+    doc.save(`OJT_DTR_Report_${today}.pdf`);
 };

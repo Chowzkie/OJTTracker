@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OJT DTR Tracker</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="icon" href="/Favicon.png" type="image/x-icon">
+    <link rel="icon" href="/Favicon.jpg" type="image/x-icon">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
@@ -22,8 +22,8 @@
             <div class="progress" style="height: 25px;">
                 <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 0%">0%</div>
             </div>
-            <button class="btn btn-sm btn-outline-success mt-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#progressModal">
-                See Progress
+            <button class="btn btn-sm btn-outline-success mt-3 shadow-sm fw-bold" data-bs-toggle="modal" data-bs-target="#progressModal">
+                🔍 See Progress
             </button>
         </div>
     </div>
@@ -31,12 +31,11 @@
     <div class="row justify-content-center mb-4">
         <div class="col-md-10">
             <div class="card text-center p-4 shadow border-0">
-                <h3>Time</h3>
-                <div id="currentTime" class="display-4 mb-3">00:00:00</div>
+                <div id="currentTime" class="display-4 mb-3">00:00:00 AM</div>
                 <div class="d-flex justify-content-center flex-wrap gap-2">
-                    <button id="btnIn" class="btn btn-success btn-lg px-4">Check In</button>
+                    <button id="btnIn" class="btn btn-success btn-lg px-4">Time In</button>
                     <button id="btnLunch" class="btn btn-warning btn-lg px-4" disabled>Lunch Break</button>
-                    <button id="btnOut" class="btn btn-danger btn-lg px-4" disabled>Check Out</button>
+                    <button id="btnOut" class="btn btn-danger btn-lg px-4" disabled>Time Out</button>
                     <button class="btn btn-outline-dark btn-lg" data-bs-toggle="modal" data-bs-target="#settingsModal">⚙️</button>
                 </div>
             </div>
@@ -45,9 +44,9 @@
 
     <div class="row">
         <div class="col-md-11 mx-auto">
-            <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                 <button class="btn btn-sm btn-outline-primary fw-bold" data-bs-toggle="modal" data-bs-target="#manualEntryModal">+ MANUAL ENTRY</button>
-                <button id="btnDownload" class="btn btn-primary btn-sm">Download PDF Report</button>
+                <button id="btnDownload" class="btn btn-primary btn-sm">Download DTR Report</button>
             </div>
             <div class="table-responsive bg-white shadow-sm rounded">
                 <table class="table table-hover align-middle mb-0 text-center">
@@ -70,8 +69,8 @@
 
 <div class="modal fade" id="manualEntryModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
+        <div class="modal-content shadow">
+            <div class="modal-header border-0">
                 <h5 class="modal-title fw-bold">Manual Entry</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -82,11 +81,11 @@
                 </div>
                 <div class="row mb-3">
                     <div class="col">
-                        <label class="form-label small text-muted">Time In (24h)</label>
+                        <label class="form-label small text-muted">Time In</label>
                         <input type="time" id="manualIn" class="form-control">
                     </div>
                     <div class="col">
-                        <label class="form-label small text-muted">Time Out (24h)</label>
+                        <label class="form-label small text-muted">Time Out</label>
                         <input type="time" id="manualOut" class="form-control">
                     </div>
                 </div>
@@ -115,15 +114,15 @@
                     <div class="col-6">
                         <div class="p-3 border rounded bg-light">
                             <small class="text-muted d-block">Completed</small>
-                            <h3 id="modalCompleted" class="m-0 text-success">0</h3>
-                            <small>Hours</small>
+                            <h3 id="modalCompleted" class="m-0 text-success fw-bold">0</h3>
+                            <small>Whole Hours</small>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="p-3 border rounded bg-light">
                             <small class="text-muted d-block">Remaining</small>
-                            <h3 id="modalRemaining" class="m-0 text-danger">0</h3>
-                            <small>Hours</small>
+                            <h3 id="modalRemaining" class="m-0 text-danger fw-bold">0</h3>
+                            <small>Whole Hours</small>
                         </div>
                     </div>
                 </div>
@@ -139,7 +138,7 @@
 
 <div class="modal fade" id="settingsModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-sm">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow">
             <div class="modal-header"><h5 class="modal-title">Settings</h5></div>
             <div class="modal-body">
                 <label class="form-label">Required Total Hours:</label>
@@ -157,7 +156,7 @@
     <div id="liveToast" class="toast align-items-center text-white bg-dark border-0" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="d-flex">
             <div class="toast-body" id="toastMessage"></div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-toast="toast"></button>
         </div>
     </div>
 </div>

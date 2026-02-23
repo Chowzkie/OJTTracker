@@ -1,12 +1,13 @@
 body {
     background-color: #f8f9fa;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Inter', -apple-system, system-ui, sans-serif;
 }
 
 #currentTime {
     font-weight: 800;
     color: #212529;
     letter-spacing: -1px;
+    font-variant-numeric: tabular-nums;
 }
 
 .card {
@@ -23,6 +24,7 @@ body {
     background-color: #212529;
     font-size: 0.75rem;
     text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .day-cell {
@@ -37,4 +39,10 @@ body {
 
 .toast {
     min-width: 300px;
+}
+
+/* Responsiveness for small devices */
+@media (max-width: 576px) {
+    .display-4 { font-size: 2.5rem; }
+    .table { font-size: 0.8rem; }
 }
