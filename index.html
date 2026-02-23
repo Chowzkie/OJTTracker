@@ -22,17 +22,21 @@
             <div class="progress" style="height: 25px;">
                 <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 0%">0%</div>
             </div>
+            <button class="btn btn-sm btn-outline-success mt-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#progressModal">
+                See Progress
+            </button>
         </div>
     </div>
 
     <div class="row justify-content-center mb-4">
         <div class="col-md-10">
             <div class="card text-center p-4 shadow border-0">
+                <h3>Time</h3>
                 <div id="currentTime" class="display-4 mb-3">00:00:00</div>
                 <div class="d-flex justify-content-center flex-wrap gap-2">
-                    <button id="btnIn" class="btn btn-success btn-lg px-4">Clock In</button>
-                    <button id="btnLunch" class="btn btn-warning btn-lg px-4" disabled>🍱 Lunch Break</button>
-                    <button id="btnOut" class="btn btn-danger btn-lg px-4" disabled>Clock Out</button>
+                    <button id="btnIn" class="btn btn-success btn-lg px-4">Check In</button>
+                    <button id="btnLunch" class="btn btn-warning btn-lg px-4" disabled>Lunch Break</button>
+                    <button id="btnOut" class="btn btn-danger btn-lg px-4" disabled>Check Out</button>
                     <button class="btn btn-outline-dark btn-lg" data-bs-toggle="modal" data-bs-target="#settingsModal">⚙️</button>
                 </div>
             </div>
@@ -68,7 +72,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title fw-bold">Manual entry</h5>
+                <h5 class="modal-title fw-bold">Manual Entry</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
@@ -78,15 +82,15 @@
                 </div>
                 <div class="row mb-3">
                     <div class="col">
-                        <label class="form-label small text-muted">Time In</label>
+                        <label class="form-label small text-muted">Time In (24h)</label>
                         <input type="time" id="manualIn" class="form-control">
                     </div>
                     <div class="col">
-                        <label class="form-label small text-muted">Time Out</label>
+                        <label class="form-label small text-muted">Time Out (24h)</label>
                         <input type="time" id="manualOut" class="form-control">
                     </div>
                 </div>
-                <div class="form-check mb-2">
+                <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="manualLunch">
                     <label class="form-check-label" for="manualLunch">Deduct 1 hour for lunch break</label>
                 </div>
@@ -94,6 +98,40 @@
             <div class="modal-footer border-0">
                 <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-primary px-4" onclick="addManualEntry()">Save Entry</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="progressModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title fw-bold">Internship Breakdown</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="p-3 border rounded bg-light">
+                            <small class="text-muted d-block">Completed</small>
+                            <h3 id="modalCompleted" class="m-0 text-success">0</h3>
+                            <small>Hours</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 border rounded bg-light">
+                            <small class="text-muted d-block">Remaining</small>
+                            <h3 id="modalRemaining" class="m-0 text-danger">0</h3>
+                            <small>Hours</small>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="my-3">
+                    <h5 class="mb-1 text-secondary">Completion Rate</h5>
+                    <div class="display-5 fw-bold text-primary" id="modalPercentage">0%</div>
+                </div>
             </div>
         </div>
     </div>

@@ -1,6 +1,6 @@
 body {
     background-color: #f8f9fa;
-    font-family: 'Inter', -apple-system, sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 #currentTime {
@@ -11,6 +11,7 @@ body {
 
 .card {
     border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important;
 }
 
 .progress {
@@ -22,7 +23,6 @@ body {
     background-color: #212529;
     font-size: 0.75rem;
     text-transform: uppercase;
-    letter-spacing: 1px;
 }
 
 .day-cell {
@@ -31,7 +31,10 @@ body {
     color: #6c757d;
 }
 
+.modal-content {
+    border-radius: 15px;
+}
+
 .toast {
     min-width: 300px;
-    border-radius: 10px;
 }

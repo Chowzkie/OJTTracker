@@ -16,11 +16,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function startClock() {
     setInterval(() => {
-        document.getElementById('currentTime').innerText = new Date().toLocaleTimeString();
+        // Force 24-hour format
+        document.getElementById('currentTime').innerText = new Date().toLocaleTimeString('en-GB', { 
+            hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false 
+        });
     }, 1000);
 }
 
-// Custom Toast Function for centered Alerts
 function showAlert(message) {
     const toastElement = document.getElementById('liveToast');
     document.getElementById('toastMessage').innerText = message;
@@ -37,7 +39,6 @@ function renderUI() {
         const hrs = parseFloat(log.duration) || 0;
         totalWorked += hrs;
 
-        // Auto-detect day name
         const dayName = new Date(log.date).toLocaleDateString('en-US', { weekday: 'long' });
 
         return `
@@ -53,10 +54,17 @@ function renderUI() {
             </tr>`;
     }).join('');
 
+    const remaining = Math.max(0, goalHours - totalWorked).toFixed(2);
     const percent = Math.min((totalWorked / goalHours) * 100, 100).toFixed(1);
+
     progressBar.style.width = percent + '%';
     progressBar.innerText = percent + '%';
     progressText.innerText = `${totalWorked.toFixed(2)} / ${goalHours} total hours`;
+
+    // Update Progress Modal
+    document.getElementById('modalCompleted').innerText = totalWorked.toFixed(2);
+    document.getElementById('modalRemaining').innerText = remaining;
+    document.getElementById('modalPercentage').innerText = percent + '%';
 
     const isClockedIn = logs.length > 0 && !logs[logs.length - 1].timeOut;
     btnIn.disabled = isClockedIn;
@@ -71,7 +79,7 @@ btnIn.onclick = () => {
     const now = new Date();
     logs.push({
         date: now.toISOString().split('T')[0],
-        timeIn: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timeIn: now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false }),
         timeOut: null,
         rawIn: now.getTime(),
         duration: null,
@@ -92,7 +100,7 @@ btnOut.onclick = () => {
     const now = new Date();
     const lastLog = logs[logs.length - 1];
     if (lastLog && !lastLog.timeOut) {
-        lastLog.timeOut = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        lastLog.timeOut = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
         let diff = (now.getTime() - lastLog.rawIn) / 3600000;
         if (lastLog.lunchApplied) diff -= 1;
         lastLog.duration = Math.max(0, diff).toFixed(2);
@@ -114,19 +122,23 @@ function addManualEntry() {
     if (end <= start) return showAlert("Time Out must be after Time In");
 
     let diff = (end - start) / 3600000;
-    if (isLunch) diff -= 1;
+    if (isLunch) {
+        if (diff < 1) return showAlert("Shift too short for lunch deduction!");
+        diff -= 1;
+    }
 
     logs.push({
         date: dateVal,
         timeIn: tIn,
         timeOut: tOut,
-        duration: Math.max(0, diff).toFixed(2),
+        duration: diff.toFixed(2),
         rawIn: start.getTime(),
         lunchApplied: isLunch
     });
 
     renderUI();
     bootstrap.Modal.getInstance(document.getElementById('manualEntryModal')).hide();
+    
     // Clear form
     document.getElementById('manualDate').value = "";
     document.getElementById('manualIn').value = "";
@@ -149,7 +161,7 @@ function deleteLog(index) {
 }
 
 function clearAllData() {
-    if (confirm("This will erase all logs permanently! Continue?")) {
+    if (confirm("Erase all logs?")) {
         logs = [];
         renderUI();
     }
@@ -159,7 +171,13 @@ document.getElementById('btnDownload').onclick = () => {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     doc.text("OJT ATTENDANCE REPORT", 14, 15);
-    const tableData = logs.map(l => [l.date, new Date(l.date).toLocaleDateString('en-US', {weekday:'short'}), l.timeIn, l.timeOut || '-', l.duration || '0.00']);
+    const tableData = logs.map(l => [
+        l.date, 
+        new Date(l.date).toLocaleDateString('en-US', {weekday:'short'}), 
+        l.timeIn, 
+        l.timeOut || '-', 
+        l.duration || '0.00'
+    ]);
     doc.autoTable({ head: [['Date', 'Day', 'In', 'Out', 'Hours']], body: tableData, startY: 25 });
-    doc.save(`OJT_Report_${new Date().toLocaleDateString()}.pdf`);
+    doc.save("OJT_DTR_Report.pdf");
 };
