@@ -1,0 +1,37 @@
+body {
+    background-color: #f8f9fa;
+    font-family: 'Inter', -apple-system, sans-serif;
+}
+
+#currentTime {
+    font-weight: 800;
+    color: #212529;
+    letter-spacing: -1px;
+}
+
+.card {
+    border-radius: 12px;
+}
+
+.progress {
+    border-radius: 20px;
+    background-color: #e9ecef;
+}
+
+.table thead th {
+    background-color: #212529;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.day-cell {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #6c757d;
+}
+
+.toast {
+    min-width: 300px;
+    border-radius: 10px;
+}
